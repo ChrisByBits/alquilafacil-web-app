@@ -9,4 +9,14 @@ export class NotificationsApiService {
     const response = await http.get(`/notification/${userId}`);
     return response.data;
   }
+
+  async delete(notificationId) {
+    const response = await http.delete(`/notification/${notificationId}`);
+    return response.data;
+  }
+
+  async markAsRead(notificationId) {
+    const response = await http.patch(`/notification/${notificationId}/read`);
+    return response.data;
+  }
 }

@@ -3,8 +3,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthenticationStore } from '../services/authentication.store';
 import { SignInRequest } from '../model/sign-in.request';
-import GoogleSignInButtonComponent from '../components/GoogleSignInButton.component.vue';
-import FacebookSignInButtonComponent from '../components/FacebookSignInButton.component.vue';
 import InputFieldComponent from '../components/InputField.component.vue';
 
 const router = useRouter();
@@ -84,15 +82,6 @@ const goToSignUp = () => {
       <button type="button" class="bg-(--secondary-color) text-white p-4 rounded-md hover:cursor-pointer" @click="goToSignUp">
         Regístrate
       </button>
-      <!--
-      <p class="text-center text-base text-white">
-        o inicia sesión con:
-      </p>
-      <div class="flex justify-center items-center gap-2">
-        <FacebookSignInButtonComponent />
-        <GoogleSignInButtonComponent />
-      </div>
-      -->
     </form>
   </section>
 </template>

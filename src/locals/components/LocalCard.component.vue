@@ -2,6 +2,7 @@
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { LocalResponse } from '../model/local.response';
+import OptimizedImageComponent from '@/shared/components/OptimizedImage.component.vue';
 
 const props = defineProps({
   local: Object,
@@ -50,7 +51,16 @@ const addToFavorites = async () => {
     class="flex flex-col shadow-lg rounded-lg hover:shadow-xl transition duration-300 ease-in-out hover:cursor-pointer bg-(--background-card-color)"
     @click="goToLocal"
   >
-    <img :src="localResponse.photoUrls[0]" alt="Local Image" class="w-full h-60 object-cover rounded-lg" />
+    <OptimizedImageComponent
+      :src="localResponse.photoUrls[0]"
+      :alt="localResponse.localName"
+      aspect-ratio="4/3"
+      :width="400"
+      fit="cover"
+      placeholder="blur"
+      rounded="lg"
+      class="w-full h-60"
+    />
     <div class="p-4 rounded-lg flex justify-between items-center">
       <div class="flex flex-col gap-1">
         <h2 class="text-xl font-semibold text-(--text-color)">{{ localResponse.localName }}</h2>

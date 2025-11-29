@@ -42,6 +42,15 @@ onMounted(async () => {
           <RouterLink :to="`/local/${local.id}`" class="w-full px-4 py-2 bg-(--button-color) hover:bg-(--button-color-hover) text-xl text-black text-center rounded-md hover:cursor-pointer">
             Ver detalles
           </RouterLink>
+          <RouterLink :to="`/edit-local/${local.id}`" class="w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-xl text-white text-center rounded-md hover:cursor-pointer">
+            Editar
+          </RouterLink>
+          <RouterLink :to="`/stats/${local.id}`" class="w-full px-4 py-2 bg-(--primary-color) text-xl text-white text-center rounded-md hover:bg-(--primary-color-hover) hover:cursor-pointer">
+            Estadisticas
+          </RouterLink>
+          <RouterLink :to="`/availability/${local.id}`" class="w-full px-4 py-2 bg-purple-600 text-xl text-white text-center rounded-md hover:bg-purple-700 hover:cursor-pointer">
+            Disponibilidad
+          </RouterLink>
           <RouterLink :to="`/monitoring/${local.id}`" class="w-full px-4 py-2 bg-(--secondary-color) text-xl text-white text-center rounded-md hover:bg-(--secondary-color-hover) hover:cursor-pointer">
             Monitorear
           </RouterLink>

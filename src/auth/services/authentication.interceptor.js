@@ -1,5 +1,3 @@
-import {useAuthenticationStore} from "./authentication.store.js";
-
 /**
  * Authentication Interceptor
  *
@@ -9,10 +7,9 @@ import {useAuthenticationStore} from "./authentication.store.js";
  * @returns {*} - Modified axios request configuration
  */
 export const authenticationInterceptor = (config) => {
-  const authenticationStore = useAuthenticationStore();
-  const isSignedIn = authenticationStore.isSignedIn;
-  if (isSignedIn) {
-    config.headers.Authorization = `Bearer ${authenticationStore.currentToken}`;
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 }

@@ -2,6 +2,7 @@
 import { watch, ref } from 'vue';
 import { ProfileResponse } from '../model/profile.response';
 import EditableProfileField from './EditableProfileField.component.vue';
+import AvatarUploadComponent from './AvatarUpload.component.vue';
 import { ProfilesApiService } from '../services/profiles-api.service';
 import { useAuthenticationStore } from '../../auth/services/authentication.store';
 import { ProfileRequest } from '../model/profile.request';
@@ -14,6 +15,7 @@ const profileResponse = ref(null);
 const profilesApiService = new ProfilesApiService();
 const authenticationStore = useAuthenticationStore();
 const isLoaded = ref(false);
+const isSaving = ref(false);
 
 watch(
   () => props.profile,
@@ -26,19 +28,51 @@ watch(
   { immediate: true }
 );
 
+const handleAvatarChanged = async (newAvatarUrl) => {
+  if (profileResponse.value) {
+    profileResponse.value.avatarUrl = newAvatarUrl;
+    await updateProfile();
+  }
+};
+
+const handleAvatarRemoved = async () => {
+  if (profileResponse.value) {
+    profileResponse.value.avatarUrl = null;
+    await updateProfile();
+  }
+};
+
 const updateProfile = async () => {
-  const profileRequest = new ProfileRequest(profileResponse.value);
-  await profilesApiService.update(authenticationStore.userId, profileRequest);
-  alert('Perfil actualizado correctamente');  
+  isSaving.value = true;
+  try {
+    const profileRequest = new ProfileRequest(profileResponse.value);
+    await profilesApiService.update(authenticationStore.userId, profileRequest);
+    alert('Perfil actualizado correctamente');
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    alert('Error al actualizar el perfil');
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 </script>
 
 <template>
   <div v-if="isLoaded" class="w-full p-4 flex flex-col gap-10">
-    <h2 class="text-xl md:text-4xl font-bold text-center mb-6 text-(--text-color)">
-      Bienvenido, {{  profileResponse.fullName }}
-    </h2>
+    <!-- Avatar and welcome section -->
+    <div class="flex flex-col items-center gap-6">
+      <AvatarUploadComponent
+        :current-avatar="profileResponse.avatarUrl"
+        :user-name="profileResponse.fullName"
+        size="xl"
+        @avatar-changed="handleAvatarChanged"
+        @avatar-removed="handleAvatarRemoved"
+      />
+      <h2 class="text-xl md:text-4xl font-bold text-center text-(--text-color)">
+        Bienvenido, {{ profileResponse.fullName }}
+      </h2>
+    </div>
 
     <form class="grid grid-cols-1 md:grid-cols-2 gap-10 xl:gap-18 justify-center items-center">
       <EditableProfileField

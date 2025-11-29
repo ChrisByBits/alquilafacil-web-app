@@ -6,7 +6,11 @@ import {SignUpResponse} from "@/auth/model/sign-up.response.js";
 const authenticationService = new AuthenticationService();
 
 export const useAuthenticationStore = defineStore( 'authentication', {
-  state: () => ({ signedIn: false, userId: 0, username: ''}),
+  state: () => ({
+    signedIn: !!localStorage.getItem('token'),
+    userId: parseInt(localStorage.getItem('userId')) || 0,
+    username: localStorage.getItem('username') || ''
+  }),
   getters: {
     isSignedIn: (state) => state['signedIn'],
     currentUserId: (state) => state['userId'],
@@ -20,12 +24,26 @@ export const useAuthenticationStore = defineStore( 'authentication', {
         const signInResponse = new SignInResponse(
           response.id,
           response.username,
-          response.token
+          response.accessToken
         );
+
+        // Guardar en localStorage primero
+        const token = signInResponse.token;
+        if (!token) {
+          console.error('Token no recibido del servidor:', response);
+          throw new Error('No se recibió token del servidor');
+        }
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', signInResponse.id.toString());
+        localStorage.setItem('username', signInResponse.username);
+
+        // Actualizar estado
         this.signedIn = true;
         this.userId = signInResponse.id;
         this.username = signInResponse.username;
-        localStorage.setItem('token', signInResponse.token); 
+
+        console.log('Login exitoso, token guardado:', !!localStorage.getItem('token'));
         router.push('/');
       } catch (error) {
         console.error('Error en signIn del store:', error);
@@ -54,22 +72,6 @@ export const useAuthenticationStore = defineStore( 'authentication', {
       const googleUser = await authenticationService.signInWithGoogle();
       if (googleUser) {
         console.log('SESION INICIADA Google user:', googleUser);
-        /*
-        authenticationService.signIn(googleUser)
-          .then(response => {
-            let signInResponse = new SignInResponse(response.data.id, response.data.username, response.data.token);
-            this.signedIn = true;
-            this.userId = signInResponse.id;
-            this.username = signInResponse.username;
-            localStorage.setItem('token', signInResponse.token);
-            console.log(signInResponse);
-            router.push({name: 'home'});
-          })
-          .catch(error => {
-            console.error(error);
-            router.push({name: 'sign-in'});
-          });
-          */
       } else {
         console.error("Google sign-in failed.");
         router.push('/sign-in');
@@ -79,33 +81,19 @@ export const useAuthenticationStore = defineStore( 'authentication', {
       const googleUser = await authenticationService.signInWithGoogle();
       if (googleUser) {
         console.log('REGISTRADO Google user:', googleUser);
-        /*
-        authenticationService.signUp(googleUser)
-          .then(response => {
-            let signUpResponse = new SignUpResponse(response.data.message);
-            console.log(signUpResponse.message);
-            this.signedIn = false;
-            this.userId = 0;
-            this.username = '';
-            localStorage.removeItem('token');
-            router.push({name: 'sign-in'});
-          })
-          .catch(error => {
-            console.error(error);
-            router.push({name: 'sign-in'});
-          });
-          */
       } else {
         console.error("Google sign-up failed.");
         router.push('/sign-in');
       }
-      
+
     },
     async signOut(router) {
       this.signedIn = false;
       this.userId = 0;
       this.username = '';
       localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
       router.push('/sign-in');
     }
   },

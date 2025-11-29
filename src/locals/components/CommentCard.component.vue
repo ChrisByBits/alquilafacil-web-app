@@ -1,26 +1,119 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, computed, ref } from 'vue';
 import StarRating from 'vue3-star-ratings';
 import { CommentResponse } from '../model/comment.response';
 
 const props = defineProps({
-  comment: Object
+  comment: Object,
+  showHelpful: {
+    type: Boolean,
+    default: true
+  }
 });
 
 const commentResponse = new CommentResponse(props.comment);
+
+const helpfulCount = ref(props.comment.helpfulCount || 0);
+const markedHelpful = ref(false);
+
+const formattedDate = computed(() => {
+  if (!props.comment.createdAt) return '';
+  const date = new Date(props.comment.createdAt);
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+});
+
+const ratingColor = computed(() => {
+  const rating = commentResponse.rating;
+  if (rating >= 4) return 'text-green-600 bg-green-100';
+  if (rating >= 3) return 'text-yellow-600 bg-yellow-100';
+  return 'text-red-600 bg-red-100';
+});
+
+const userInitials = computed(() => {
+  if (!commentResponse.userUsername) return 'U';
+  return commentResponse.userUsername.substring(0, 2).toUpperCase();
+});
+
+const markHelpful = () => {
+  if (!markedHelpful.value) {
+    helpfulCount.value++;
+    markedHelpful.value = true;
+  }
+};
 </script>
 
 <template>
-  <div class="flex items-center shadow-lg rounded-lg p-4 gap-2 min-h-40 text-(--text-color) bg-(--background-card-color)">
-    <div class="bg-(--primary-color) min-w-18 h-18 flex justify-center items-center rounded-full p-2">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12.12 12.78C12.05 12.77 11.96 12.77 11.88 12.78C10.12 12.72 8.71997 11.28 8.71997 9.50998C8.71997 7.69998 10.18 6.22998 12 6.22998C13.81 6.22998 15.28 7.69998 15.28 9.50998C15.27 11.28 13.88 12.72 12.12 12.78Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18.74 19.3801C16.96 21.0101 14.6 22.0001 12 22.0001C9.40001 22.0001 7.04001 21.0101 5.26001 19.3801C5.36001 18.4401 5.96001 17.5201 7.03001 16.8001C9.77001 14.9801 14.25 14.9801 16.97 16.8001C18.04 17.5201 18.64 18.4401 18.74 19.3801Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-    </div>
-    <div class="flex flex-col w-full p-2 gap-2 text-center md:text-start">
-      <div class="flex flex-col md:flex-row justify-between items-center">
-        <span class="text-sm md:text-lg font-semibold text-(--text-color)">{{commentResponse.userUsername}}</span>
-        <StarRating :model-value="commentResponse.rating" :star-color="'#fb9e49'" :inactive-color="'white'":number-of-stars="5" :star-size="20" :disable-click="true" />
+  <div class="comment-card bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-100">
+      <div class="flex items-start gap-3">
+        <!-- Avatar -->
+        <div class="w-12 h-12 bg-gradient-to-br from-(--primary-color) to-(--secondary-color) rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+          {{ userInitials }}
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="font-semibold text-gray-800 truncate">{{ commentResponse.userUsername }}</h4>
+            <span :class="['px-2 py-0.5 rounded-full text-xs font-medium', ratingColor]">
+              {{ commentResponse.rating }}/5
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2 mt-1">
+            <StarRating
+              :model-value="commentResponse.rating"
+              :star-color="'#fbbf24'"
+              :inactive-color="'#e5e7eb'"
+              :number-of-stars="5"
+              :star-size="16"
+              :disable-click="true"
+            />
+            <span v-if="formattedDate" class="text-xs text-gray-400">{{ formattedDate }}</span>
+          </div>
+        </div>
       </div>
-      <p class="text-sm md:text-lg text-(--text-color)">{{commentResponse.text}}</p>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4">
+      <p class="text-gray-700 text-sm leading-relaxed">{{ commentResponse.text }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div v-if="showHelpful" class="px-4 pb-4 flex items-center justify-between">
+      <button
+        @click="markHelpful"
+        :class="[
+          'flex items-center gap-1 text-sm transition-colors',
+          markedHelpful ? 'text-(--primary-color)' : 'text-gray-500 hover:text-(--primary-color)'
+        ]"
+        :disabled="markedHelpful"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+        </svg>
+        <span>{{ markedHelpful ? 'Marcaste como util' : 'Util' }}</span>
+        <span v-if="helpfulCount > 0" class="text-gray-400">({{ helpfulCount }})</span>
+      </button>
+
+      <!-- Verified badge if applicable -->
+      <div v-if="comment.verified" class="flex items-center gap-1 text-green-600 text-xs">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span>Verificado</span>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.comment-card {
+  border: 1px solid #f3f4f6;
+}
+</style>

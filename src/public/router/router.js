@@ -20,6 +20,11 @@ const routes = [
   { path: '/purchase-subscription/:planId', meta: { title: "Comprar suscripción"}, component: () => import('@/subscriptions/pages/SubscriptionPurchase.page.vue') },
   { path: '/report/:localId', meta: { title: "Reportar"}, component: () => import('@/locals/pages/Report.page.vue') },
   { path: '/monitoring/:localId', meta: { title: "Monitoreo"}, component: () => import('@/management/pages/LocalManagement.page.vue') },
+  { path: '/stats/:localId', meta: { title: "Estadisticas"}, component: () => import('@/locals/pages/LocalStats.page.vue') },
+  { path: '/availability/:localId', meta: { title: "Disponibilidad"}, component: () => import('@/availability/pages/AvailabilityManagement.page.vue') },
+  { path: '/chat', meta: { title: "Chat"}, component: () => import('@/chat/pages/Chat.page.vue') },
+  { path: '/contracts', meta: { title: "Contratos"}, component: () => import('@/contracts/pages/Contracts.page.vue') },
+  { path: '/edit-local/:localId', meta: { title: "Editar local"}, component: () => import('@/locals/pages/EditLocal.page.vue') },
 ]
 
 const router = createRouter({
