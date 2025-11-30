@@ -13,4 +13,12 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  server: {
+    port: 8095,
+    host: '0.0.0.0'
+  },
+  preview: {
+    port: 8095,
+    host: '0.0.0.0'
+  }
 })
