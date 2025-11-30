@@ -15,7 +15,8 @@ export default defineConfig({
   },
   server: {
     port: 8095,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    allowedHosts: ['application.canadacentral.cloudapp.azure.com']
   },
   preview: {
     port: 8095,
