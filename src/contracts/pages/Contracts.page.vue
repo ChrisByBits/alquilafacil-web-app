@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import NavbarComponent from '@/public/components/Navbar.component.vue';
 import { useAuthenticationStore } from '@/auth/services/authentication.store';
 import { ContractsService } from '../services/contracts.service';
 import ContractSigningModalComponent from '../components/ContractSigningModal.component.vue';
@@ -300,7 +301,8 @@ const getStatusText = (status) => {
 </script>
 
 <template>
-  <div class="contracts-page min-h-screen bg-gray-50 p-4 md:p-8">
+  <NavbarComponent />
+  <div class="contracts-page min-h-screen bg-gray-50 p-4 md:p-8 pt-20">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="mb-8">

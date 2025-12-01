@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
+import NavbarComponent from '@/public/components/Navbar.component.vue';
 import { useAuthenticationStore } from '@/auth/services/authentication.store';
 import { useChatStore } from '../services/chat.store';
 import ConversationListComponent from '../components/ConversationList.component.vue';
@@ -88,7 +89,8 @@ const handleReactToMessage = async ({ messageId, emoji }) => {
 </script>
 
 <template>
-  <div class="chat-page h-[calc(100vh-64px)] flex bg-white">
+  <NavbarComponent />
+  <div class="chat-page h-[calc(100vh-64px)] flex bg-white mt-16">
     <!-- Conversations sidebar -->
     <div
       class="conversations-sidebar w-full md:w-80 lg:w-96 border-r border-gray-200 bg-white"
